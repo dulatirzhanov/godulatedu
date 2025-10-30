@@ -1444,7 +1444,7 @@
         return data;
       }
 
-      window.qrcode = function(typeNumber, errorCorrectLevel) {
+            window.qrcode = function(typeNumber, errorCorrectLevel) {
         var levels = { L: 0, M: 1, Q: 2, H: 3 };
         var level = errorCorrectLevel;
         if (typeof level === 'string') {
@@ -1456,9 +1456,7 @@
         var initialVersion = typeNumber < 1 ? 1 : typeNumber;
         var qr = new QRCodeModel(initialVersion, level);
         return {
-          addData: function(data) {
-            qr.addData(data);
-          },
+          addData: function(data) { qr.addData(data); },
           make: function() {
             if (typeNumber < 1) {
               var version = 1;
@@ -1476,20 +1474,16 @@
                   throw error;
                 }
               }
-              if (version > 40) {
-                throw new Error('code length overflow.');
-              }
+              if (version > 40) { throw new Error('code length overflow.'); }
             } else {
               qr.make();
             }
           },
-          createSvgTag: function(options) {
-            return qr.createSvgTag(options);
-          }
+          createSvgTag: function(options) { return qr.createSvgTag(options || {}); }
         };
-      };
       };
     })();
   </script>
 </body>
 </html>
+
