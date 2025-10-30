@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Short Link Builder</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; background: #f5f7fb; color: #1f2933; }
+    header { padding: 2rem 1rem 1rem; text-align: center; }
+    h1 { margin: 0; font-size: 2rem; }
+    main { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; padding: 0 1rem 2rem; }
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 15px 40px rgba(15, 23, 42, 0.08); max-width: 420px; flex: 1 1 320px; }
+    .card h2 { margin-top: 0; font-size: 1.4rem; }
+    label { display: block; font-weight: 600; margin-bottom: 0.4rem; }
+    input, button, textarea { width: 100%; padding: 0.65rem 0.75rem; border: 1px solid #d2d6dc; border-radius: 8px; font-size: 1rem; font-family: inherit; box-sizing: border-box; }
+    input:focus, button:focus, textarea:focus { outline: 2px solid #3b82f6; border-color: #3b82f6; }
+    button { background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; border: none; transition: background 0.2s ease; margin-top: 0.75rem; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
+    .note { font-size: 0.9rem; color: #4b5563; margin-top: 0.75rem; }
+    .status { margin-top: 0.5rem; font-size: 0.95rem; min-height: 1.2rem; }
+    .output { margin-top: 1rem; padding: 0.75rem; border-radius: 8px; background: #ecf2ff; word-break: break-word; }
+    .output a { color: #1d4ed8; text-decoration: none; }
+    .output a:hover { text-decoration: underline; }
+    .recent { margin-top: 1.25rem; }
+    pre { background: #f8fafc; border-radius: 8px; padding: 0.75rem; overflow-x: auto; font-family: "Fira Mono", "SFMono-Regular", Menlo, monospace; font-size: 0.9rem; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Short Link Builder</h1>
+    <p>Create tracked short links for go.dulatedu.com.</p>
+  </header>
+  <main>
+    <section class="card" id="settings-card">
+      <h2>GitHub Settings</h2>
+      <label for="owner">Owner</label>
+      <input id="owner" type="text" autocomplete="off" placeholder="dulatedu" />
+      <label for="repo">Repository</label>
+      <input id="repo" type="text" autocomplete="off" placeholder="godulatedu" />
+      <label for="branch">Branch</label>
+      <input id="branch" type="text" autocomplete="off" placeholder="main" />
+      <label for="token">Fine-grained token</label>
+      <input id="token" type="password" autocomplete="off" placeholder="ghp_…" />
+      <button id="save-settings">Save settings</button>
+      <p class="note">The GitHub token is stored only in your browser&apos;s localStorage and is never committed.</p>
+      <div class="status" id="settings-status"></div>
+    </section>
+
+    <section class="card" id="generator-card">
+      <h2>UTM Short Link</h2>
+      <label for="destination">Destination URL</label>
+      <input id="destination" type="url" placeholder="https://example.com" />
+      <label for="utm-source">utm_source</label>
+      <input id="utm-source" type="text" />
+      <label for="utm-medium">utm_medium</label>
+      <input id="utm-medium" type="text" />
+      <label for="utm-campaign">utm_campaign</label>
+      <input id="utm-campaign" type="text" />
+      <label for="utm-term">utm_term (optional)</label>
+      <input id="utm-term" type="text" />
+      <label for="utm-content">utm_content (optional)</label>
+      <input id="utm-content" type="text" />
+      <label>Slug length</label>
+      <input type="text" value="4" readonly />
+      <button id="generate">Generate short link</button>
+      <div class="status" id="generate-status"></div>
+      <div class="output" id="result" hidden>
+        <p><strong>Short URL:</strong> <a id="short-url" href="#" target="_blank" rel="noopener"></a></p>
+        <p><strong>Final URL:</strong> <span id="final-url"></span></p>
+      </div>
+      <div class="recent">
+        <h3>Recent links</h3>
+        <pre id="recent-links">timestamp,slug,destination_base,utm_source,utm_medium,utm_campaign,utm_term,utm_content,final_url</pre>
+      </div>
+    </section>
+  </main>
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
