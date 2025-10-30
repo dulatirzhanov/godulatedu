@@ -414,7 +414,7 @@
 
         <div class="field">
           <label for="baseUrl">Базовая ссылка</label>
-          <input id="baseUrl" name="baseUrl" type="text" placeholder="https://dulatedu.com/" value="https://dulatedu.com/" autocomplete="url" required>
+          <input id="baseUrl" name="baseUrl" type="text" placeholder="https://dulatedu.com/" autocomplete="url" required>
           <span id="baseError" class="status"></span>
           <p class="helper-text">Вставьте рабочий адрес страницы. Если забыли указать протокол, мы автоматически добавим https://.</p>
         </div>
@@ -424,7 +424,7 @@
             <label for="utmSource">utm_source</label>
             <select id="utmSource" name="utm_source" required>
               <option value="">Выберите источник</option>
-              <option value="instagram" selected>instagram</option>
+              <option value="instagram">instagram</option>
               <option value="linkedin">linkedin</option>
               <option value="telegram">telegram</option>
               <option value="whatsapp">whatsapp</option>
@@ -438,7 +438,7 @@
             <label for="utmMedium">utm_medium</label>
             <select id="utmMedium" name="utm_medium" required>
               <option value="">Выберите канал</option>
-              <option value="social" selected>social</option>
+              <option value="social">social</option>
               <option value="referral">referral</option>
               <option value="cpc">cpc</option>
               <option value="email">email</option>
@@ -448,7 +448,7 @@
           </div>
           <div class="field">
             <label for="utmCampaign">utm_campaign</label>
-            <input id="utmCampaign" name="utm_campaign" type="text" placeholder="пример: spring_launch" value="bio" required>
+            <input id="utmCampaign" name="utm_campaign" type="text" placeholder="пример: spring_launch" required>
           </div>
           <div class="field">
             <label for="utmContent">utm_content <span style="color:var(--muted);font-weight:400;">(необязательно)</span></label>
@@ -475,15 +475,8 @@
 
         <div class="result" aria-live="polite">
           <div class="field">
-            <label for="resultUrl">Ссылка для размещения (через go.dulatedu.com)</label>
+            <label for="resultUrl">Готовая ссылка</label>
             <textarea id="resultUrl" readonly spellcheck="false"></textarea>
-            <p class="helper-text">Эту ссылку делитесь с аудиторией — она фиксирует переход через go.dulatedu.com, а затем
-              перенаправляет пользователя на нужную страницу.</p>
-          </div>
-          <div class="field">
-            <label for="rawUrl">Итоговый адрес назначения</label>
-            <textarea id="rawUrl" readonly spellcheck="false"></textarea>
-            <p class="helper-text">Для проверки правильности UTM-параметров. Этот адрес не делится напрямую.</p>
           </div>
           <div class="qr-wrapper">
             <div id="qrCode" aria-label="QR код" role="img"></div>
@@ -523,14 +516,12 @@
       const contentInput = document.getElementById('utmContent');
       const termInput = document.getElementById('utmTerm');
       const resultField = document.getElementById('resultUrl');
-      const rawField = document.getElementById('rawUrl');
       const copyBtn = document.getElementById('copyBtn');
       const qrBtn = document.getElementById('qrBtn');
       const qrContainer = document.getElementById('qrCode');
       const status = document.getElementById('statusMessage');
       const baseError = document.getElementById('baseError');
       const chips = Array.from(document.querySelectorAll('.chip'));
-      const redirectEndpoint = 'https://go.dulatedu.com/tools/utm/redirect.html';
 
       function ensureScheme(url) {
         if (!url) return url;
@@ -617,8 +608,6 @@
       function showBaseError(message) {
         baseError.textContent = message;
         baseError.classList.add('error');
-        resultField.value = '';
-        rawField.value = '';
       }
 
       function clearQr() {
@@ -662,12 +651,10 @@
 
         url.search = params.toString();
         const finalUrl = url.toString();
-        const trackingUrl = redirectEndpoint + '?to=' + encodeURIComponent(finalUrl);
-        resultField.value = trackingUrl;
-        rawField.value = finalUrl;
-        resetStatus('Ссылка готова. Используйте ссылку из go.dulatedu.com.');
+        resultField.value = finalUrl;
+        resetStatus('Ссылка готова.');
         persistState();
-        return trackingUrl;
+        return finalUrl;
       }
 
       form.addEventListener('submit', function (event) {
@@ -676,7 +663,7 @@
         clearQr();
         const url = buildUrl();
         if (url) {
-          status.textContent = 'Ссылка сгенерирована и готова к копированию.';
+          status.textContent = 'Ссылка сгенерирована.';
         }
       });
 
@@ -744,7 +731,6 @@
           updateActiveChip();
           clearQr();
           resultField.value = '';
-          rawField.value = '';
           resetStatus('Применен пресет «' + chip.textContent.trim() + '».');
           persistState();
         });
