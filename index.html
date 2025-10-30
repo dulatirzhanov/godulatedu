@@ -1,10 +1,465 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta http-equiv="refresh" content="0; url=https://dulatedu.com">
-  <title>Redirecting...</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Генератор UTM-ссылок</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5f5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card-bg: rgba(15, 23, 42, 0.9);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --border: #1e293b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      padding: 2rem 1rem;
+    }
+
+    .app-wrapper {
+      width: min(960px, 100%);
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.8rem, 2.5vw + 1rem, 2.5rem);
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      padding: clamp(1.5rem, 1.5vw + 1rem, 2.5rem);
+      backdrop-filter: blur(16px);
+    }
+
+    form {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font: inherit;
+      color: inherit;
+      background: rgba(255, 255, 255, 0.65);
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .grid-two-columns {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .custom-params {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .custom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .custom-row button {
+      padding: 0.65rem;
+      border-radius: 10px;
+      border: none;
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .custom-row button:hover {
+      background: rgba(239, 68, 68, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.85rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 35px rgba(37, 99, 235, 0.25);
+      background: var(--accent-dark);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      border-radius: 12px;
+      padding: 0.85rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    button.secondary:hover {
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .output-card {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .output-card textarea {
+      resize: vertical;
+      min-height: 120px;
+      background: rgba(15, 23, 42, 0.75);
+      color: #f8fafc;
+      font-weight: 500;
+      border-radius: 14px;
+      border: none;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.15);
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .error.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <p>Redirecting to <a href="https://dulatedu.com">dulatedu.com</a></p>
+  <main class="app-wrapper">
+    <header>
+      <h1>Генератор UTM-ссылок</h1>
+      <p>Соберите промо-ссылку с нужными UTM-метками за секунды — просто заполните поля ниже.</p>
+    </header>
+
+    <section class="card">
+      <form id="utm-form" autocomplete="off">
+        <div class="field">
+          <label for="base-url">Целевая ссылка</label>
+          <input type="url" id="base-url" name="base-url" placeholder="https://example.com/landing" required />
+          <p class="note">Укажите полный адрес страницы, на которую вы хотите вести трафик.</p>
+          <p class="error" id="base-url-error">Похоже, ссылка некорректна. Проверьте, что она начинается с http:// или https://</p>
+        </div>
+
+        <div class="grid-two-columns">
+          <div class="field">
+            <label for="utm-source">UTM Source</label>
+            <input type="text" id="utm-source" name="utm-source" placeholder="facebook" />
+          </div>
+          <div class="field">
+            <label for="utm-medium">UTM Medium</label>
+            <input type="text" id="utm-medium" name="utm-medium" placeholder="cpc" />
+          </div>
+        </div>
+
+        <div class="grid-two-columns">
+          <div class="field">
+            <label for="utm-campaign">UTM Campaign</label>
+            <input type="text" id="utm-campaign" name="utm-campaign" placeholder="black_friday" />
+          </div>
+          <div class="field">
+            <label for="utm-term">UTM Term</label>
+            <input type="text" id="utm-term" name="utm-term" placeholder="ключевое_слово" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="utm-content">UTM Content</label>
+          <input type="text" id="utm-content" name="utm-content" placeholder="вариант_баннера" />
+        </div>
+
+        <fieldset class="custom-params">
+          <legend>Дополнительные параметры</legend>
+          <div id="custom-params-container"></div>
+          <button type="button" class="secondary" id="add-param">Добавить параметр</button>
+        </fieldset>
+
+        <div class="actions">
+          <button type="button" class="secondary" id="reset-form">Очистить</button>
+          <button type="submit" class="primary">Сгенерировать</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card output-card">
+      <div class="field">
+        <label for="result-url">Результирующая ссылка</label>
+        <textarea id="result-url" readonly placeholder="Сгенерированная UTM-ссылка появится здесь"></textarea>
+      </div>
+      <div class="actions" style="justify-content: space-between;">
+        <p class="note">Скопируйте готовую ссылку и используйте её в своих рекламных материалах.</p>
+        <button type="button" class="primary" id="copy-link">Скопировать ссылку</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('utm-form');
+    const resultTextarea = document.getElementById('result-url');
+    const baseUrlInput = document.getElementById('base-url');
+    const baseUrlError = document.getElementById('base-url-error');
+    const addParamButton = document.getElementById('add-param');
+    const customParamsContainer = document.getElementById('custom-params-container');
+    const resetButton = document.getElementById('reset-form');
+    const copyButton = document.getElementById('copy-link');
+
+    const slugify = (value) => value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9-_]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
+
+    const createCustomRow = (name = '', value = '') => {
+      const row = document.createElement('div');
+      row.className = 'custom-row';
+      row.innerHTML = `
+        <input type="text" class="custom-name" placeholder="utm_custom" value="${name}" />
+        <input type="text" class="custom-value" placeholder="значение" value="${value}" />
+        <button type="button" aria-label="Удалить параметр">✕</button>
+      `;
+
+      row.querySelector('button').addEventListener('click', () => {
+        row.remove();
+        generateLink();
+      });
+
+      ['input', 'change'].forEach((eventName) => {
+        row.querySelectorAll('input').forEach((input) => {
+          input.addEventListener(eventName, () => {
+            if (eventName === 'change') {
+              input.value = slugify(input.value);
+            }
+            generateLink();
+          });
+        });
+      });
+
+      return row;
+    };
+
+    const getFormData = () => {
+      const data = {
+        baseUrl: baseUrlInput.value.trim(),
+        params: {
+          utm_source: slugify(document.getElementById('utm-source').value),
+          utm_medium: slugify(document.getElementById('utm-medium').value),
+          utm_campaign: slugify(document.getElementById('utm-campaign').value),
+          utm_term: slugify(document.getElementById('utm-term').value),
+          utm_content: slugify(document.getElementById('utm-content').value)
+        },
+        custom: []
+      };
+
+      customParamsContainer.querySelectorAll('.custom-row').forEach((row) => {
+        const name = slugify(row.querySelector('.custom-name').value);
+        const value = slugify(row.querySelector('.custom-value').value);
+        if (name && value) {
+          data.custom.push([name, value]);
+        }
+      });
+
+      return data;
+    };
+
+    const buildUrl = () => {
+      const { baseUrl, params, custom } = getFormData();
+      if (!baseUrl) {
+        baseUrlError.classList.remove('active');
+        return '';
+      }
+
+      let url;
+      try {
+        url = new URL(baseUrl);
+        baseUrlError.classList.remove('active');
+      } catch (error) {
+        baseUrlError.classList.add('active');
+        return '';
+      }
+
+      const allParams = new URLSearchParams(url.search);
+      Object.entries(params).forEach(([key, value]) => {
+        if (value) {
+          allParams.set(key, value);
+        } else {
+          allParams.delete(key);
+        }
+      });
+
+      custom.forEach(([name, value]) => {
+        allParams.set(name, value);
+      });
+
+      url.search = allParams.toString();
+      return url.toString();
+    };
+
+    const generateLink = () => {
+      const finalUrl = buildUrl();
+      resultTextarea.value = finalUrl;
+      return finalUrl;
+    };
+
+    addParamButton.addEventListener('click', () => {
+      customParamsContainer.appendChild(createCustomRow());
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const link = generateLink();
+      if (link) {
+        resultTextarea.focus();
+        resultTextarea.select();
+      }
+    });
+
+    form.querySelectorAll('input').forEach((input) => {
+      input.addEventListener('input', () => {
+        if (['utm-source', 'utm-medium', 'utm-campaign', 'utm-term', 'utm-content'].includes(input.id)) {
+          const { selectionStart } = input;
+          input.value = slugify(input.value);
+          input.setSelectionRange(selectionStart, selectionStart);
+        }
+        generateLink();
+      });
+
+      input.addEventListener('change', () => {
+        if (input.type !== 'url') {
+          input.value = slugify(input.value);
+        }
+        generateLink();
+      });
+    });
+
+    resetButton.addEventListener('click', () => {
+      form.reset();
+      customParamsContainer.innerHTML = '';
+      resultTextarea.value = '';
+      baseUrlError.classList.remove('active');
+      baseUrlInput.focus();
+    });
+
+    copyButton.addEventListener('click', async () => {
+      const link = generateLink();
+      if (!link) {
+        baseUrlInput.focus();
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(link);
+        copyButton.textContent = 'Скопировано!';
+        copyButton.disabled = true;
+        setTimeout(() => {
+          copyButton.textContent = 'Скопировать ссылку';
+          copyButton.disabled = false;
+        }, 1600);
+      } catch (error) {
+        copyButton.textContent = 'Не удалось скопировать';
+        setTimeout(() => {
+          copyButton.textContent = 'Скопировать ссылку';
+        }, 1600);
+      }
+    });
+
+    // Автогенерация при загрузке, если есть пример ссылки в адресной строке
+    generateLink();
+  </script>
 </body>
 </html>
