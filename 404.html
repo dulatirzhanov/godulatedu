@@ -8,57 +8,70 @@
   <style>
     :root { color-scheme: light dark }
 
-    /* base */
+    /* базовая структура */
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       margin: 0;
       background: #fff;
       color: #333;
     }
-    h1 { margin: 0 0 8px }
-    p  { margin: 8px 0; color: #444 }
 
-    /* card in brand style */
+    /* карточка */
     .card {
-      margin: 0 auto;
-      padding: 24px 20px;
-      border-radius: 16px;
       background: #fff;
+      border-radius: 16px;
       box-shadow: 0 12px 40px rgba(0,0,0,.25);
-      width: calc(100vw - 40px);
+      padding: 24px 20px;
       max-width: 420px;
+      width: calc(100vw - 40px);
+      text-align: center;
     }
 
-    /* brand CTA like on main site */
+    /* заголовок и текст меньшего размера */
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* кнопка в стиле твоего сайта */
     .cta-post {
       display: inline-block;
-      margin: 16px 0 0;
-      padding: 12px 18px;
+      padding: 10px 16px;
       border-radius: 12px;
       font-weight: bold;
       text-decoration: none;
+      font-size: 0.9rem;
       background: rgba(10,102,194,0.06);
       color: #0a66c2;
       border: 1px solid rgba(10,102,194,0.25);
       transition: background .15s ease, border-color .15s ease;
     }
+
     .cta-post:hover {
       background: rgba(10,102,194,0.1);
       border-color: rgba(10,102,194,0.35);
     }
 
-    /* dark mode to match your site */
+    /* тёмная тема */
     @media (prefers-color-scheme: dark) {
       body { background: #111; color: #ddd; }
       p { color: #bbb; }
-
       .card {
         background: #1a1a1a;
         box-shadow: 0 12px 40px rgba(0,0,0,.6);
       }
-
       .cta-post {
         background: rgba(207,224,255,0.06);
         color: #cfe0ff;
@@ -72,7 +85,7 @@
   </style>
 </head>
 <body>
-  <div class="card" role="status" aria-live="polite">
+  <div class="card">
     <h1 id="status">Checking short link…</h1>
     <p id="message"></p>
     <a id="homeBtn" class="cta-post" href="/" style="display:none" rel="noopener">Go to Home</a>
@@ -80,37 +93,35 @@
 
   <script>
     (function () {
-      var statusEl = document.getElementById('status');
-      var messageEl = document.getElementById('message');
-      var homeBtn  = document.getElementById('homeBtn');
+      const statusEl = document.getElementById('status');
+      const messageEl = document.getElementById('message');
+      const homeBtn = document.getElementById('homeBtn');
+      const slug = window.location.pathname.replace(/^\/+/, '').replace(/\/+$/, '');
 
-      var slug = window.location.pathname.replace(/^\/+/, '').replace(/\/+$/, '');
       if (!slug) {
         statusEl.textContent = 'Unknown short code.';
         messageEl.textContent = 'No short code was provided.';
         homeBtn.style.display = 'inline-block';
         return;
-        }
+      }
 
       fetch('/data/mapping.json', { cache: 'no-store' })
-        .then(function (r) {
+        .then(r => {
           if (!r.ok) throw new Error('Unable to load mapping.');
           return r.json();
         })
-        .then(function (mapping) {
-          var entry = mapping && mapping[slug];
-          var url = entry && entry.final_url;
-          if (url) {
+        .then(mapping => {
+          if (mapping && mapping[slug] && mapping[slug].final_url) {
             statusEl.textContent = 'Redirecting…';
             messageEl.textContent = 'Sending you to your destination.';
-            window.location.replace(url);
+            window.location.replace(mapping[slug].final_url);
           } else {
             statusEl.textContent = 'Unknown short code.';
             messageEl.textContent = 'We could not find a destination for "' + slug + '".';
             homeBtn.style.display = 'inline-block';
           }
         })
-        .catch(function (err) {
+        .catch(err => {
           statusEl.textContent = 'Redirect failed.';
           messageEl.textContent = err.message;
           homeBtn.style.display = 'inline-block';
