@@ -98,5 +98,15 @@
     "utm_content": "mywebsite",
     "final_url": "https://www.instagram.com/thislifeisg/?utm_source=mywebsite&utm_medium=landing&utm_campaign=pb&utm_content=mywebsite",
     "created_at": "2025-10-30T18:39:28.646Z"
+  },
+  "7bCl": {
+    "destination_url": "https://dulatedu.com/services/",
+    "utm_source": "mywebsite",
+    "utm_medium": "link",
+    "utm_campaign": "services",
+    "utm_term": "",
+    "utm_content": "",
+    "final_url": "https://dulatedu.com/services/?utm_source=mywebsite&utm_medium=link&utm_campaign=services",
+    "created_at": "2025-11-01T21:12:38.689Z"
   }
 }
